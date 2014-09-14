@@ -4,12 +4,12 @@ fbtext is the Flower Bridge Text!
 
 you can download code by github
 
-then you can add the fbtext script to /usr/bin ,like 
 
-    sudo cp fbtext /usr/bin
+
+
 
 then you can edit file like this:
 
-    fbtext README.md
+    python $script_path $file_path
 
 you can edit the code for your love.
