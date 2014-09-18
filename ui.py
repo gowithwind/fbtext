@@ -4,63 +4,17 @@ from os import system
 import curses
 import re
 import logging,os,sys
-import urllib2
-import json
+import urllib2,json
 import locale
-
 locale.setlocale(locale.LC_ALL, 'zh_CN.UTF-8')
 logging.basicConfig(filename = os.path.join(os.getcwd(), 'log.txt'), level = logging.DEBUG)  
-
-host='https://www.v2ex.com'
-def api_call(api):
-     f=urllib2.urlopen(host+api)
-     logging.info(host+api)
-     return json.loads(f.read())
-
-class V2EX(object):
-     def __init__(self):
-          self.lines=[]
-          self.node='hot'
-     def get_topics(self):
-          if self.node=='hot':
-               self.topics=api_call('/api/topics/hot.json')
-          else:
-               self.topics=api_call('/api/topics/show.json?page=0&page_size=40&node_name='+self.node)
-          
-          lines= ['%s: %s (%s)'%(t['member']['username'].encode('utf-8'),t['title'].encode('utf-8') ,t['replies'])for t in self.topics ]
-          lines.append('')
-          lines.append('$ you can type :node to your node! :tech :python :shadowsocks')
-          return lines
-
-     def get_topic(self,id):
-          self.topic=api_call('/api/topics/show.json?id=%s'%id)[0]
-          lines= ['$ '+self.topic['member']['username'].encode('utf-8'),self.topic['title'].encode('utf-8')]
-          lines.append('-'*20)
-          lines+=self.convert(self.topic['content'])
-          lines.append('-'*20)
-          self.replies=api_call('/api/replies/show.json?topic_id=%s'%id)
-          for r in self.replies:
-               lines.append('$ '+r['member']['username'].encode('utf-8'))
-               lines+=self.convert(r['content'])
-          return lines
-     def convert(self,content):
-          lines=content.encode('utf-8').split('\n')
-          r=[]
-          for line in lines:
-               i=0
-               while i<len(line):
-                    r.append(line[i:i+80])
-                    i+=80
-          return r
 
 class UI():
      def __init__(self,screen):
           self.screen =screen
-          self.v2ex=V2EX()
-          content=''
           self.filename=''
-          self.lines = self.v2ex.get_topics()
           self.info=''
+          self.lines=[]
           self.key=0
           self.show_number=True
           self.line_no=0
@@ -118,7 +72,7 @@ class UI():
                     self.display_line_no(i,line_no)
                     self.screen.addstr(i, self.side_width, line)
                     if line and line[0]=='$':
-                         self.screen.addstr(i, self.side_width, line,curses.color_pair(1))
+                         self.screen.addstr(i, self.side_width, line,curses.color_pair(2))
                     self.display_filter_word(self.word,line_no)
                else:
                     self.screen.addstr(i, self.side_width, '~')
@@ -133,9 +87,7 @@ class UI():
           self.side_width=self.line_no_width+1
           self.body_height=self.height-1
           self.compute_view_lines()
-
           self.display_body()
-
           line=self.lines[self.line_no]
           if self.col<len(line):char=ord(line[self.col])
           else:char=' '
@@ -210,25 +162,12 @@ class UI():
                elif re.match('\d+$',input):self.line_no=int(input)
                elif re.match('set\s+number',input):self.show_number=True
                elif re.match('/\w+',input):self.word=input[1:]
-               else :
-                    self.v2ex.node=input
-                    self.info=self.v2ex.node
-                    self.lines=self.v2ex.get_topics()
-                    self.reset()
-          self.v2ex_command(ch)
-     def reset(self):
-               self.line_no=0
-               self.col=0
-               self.offset=0
-     def v2ex_command(self,ch):
-          if ch==10:#enter
-               id=self.v2ex.topics[self.line_no]['id']
-               self.lines=self.v2ex.get_topic(id)
-               self.reset()
-          if ch==ord('q'):
-               self.lines=self.v2ex.get_topics()
-               self.reset()
-
+               else :self.complex_command(input)
+          self.simple_command(ch)
+     def simple_command(self,ch):
+          pass
+     def complex_command(self,word):
+          pass
      def save(self):
           with open(self.filename,'w') as f:
                f.write('\n'.join(self.lines))
@@ -242,22 +181,22 @@ class UI():
                if self.mode=='Insert':
                     self.do_insert(ch)
                else: self.do_command(ch)
-               
+     def reset(self):
+          self.line_no=0
+          self.col=0
+          self.offset=0        
 
-class KeyHandler():
-     def __init__(self):
-          pass
-
-try:
-     screen=curses.initscr()
-     curses.noecho()
-     curses.start_color()
-     curses.use_default_colors()
-     curses.init_pair(1, curses.COLOR_GREEN, -1)
-     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_GREEN)
-     UI(screen).main_loop()
-except:
-     raise
-finally:
-     curses.echo()
-     curses.endwin()
+def startup(_UI):
+     try:
+          screen=curses.initscr()
+          curses.noecho()
+          curses.start_color()
+          curses.use_default_colors()
+          curses.init_pair(1, curses.COLOR_GREEN, -1)
+          curses.init_pair(2, curses.COLOR_BLUE, -1)
+          _UI(screen).main_loop()
+     except:
+          raise
+     finally:
+          curses.echo()
+          curses.endwin()
