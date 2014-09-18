@@ -1,21 +1,65 @@
 #!/usr/bin/env python
- 
+# encoding=utf-8
 from os import system
 import curses
 import re
 import logging,os,sys
+import urllib2
+import json
+import locale
+
+locale.setlocale(locale.LC_ALL, 'zh_CN.UTF-8')
 logging.basicConfig(filename = os.path.join(os.getcwd(), 'log.txt'), level = logging.DEBUG)  
-from plugin import plugins
+
+host='https://www.v2ex.com'
+def api_call(api):
+     f=urllib2.urlopen(host+api)
+     logging.info(host+api)
+     return json.loads(f.read())
+
+class V2EX(object):
+     def __init__(self):
+          self.lines=[]
+          self.node='hot'
+     def get_topics(self):
+          if self.node=='hot':
+               self.topics=api_call('/api/topics/hot.json')
+          else:
+               self.topics=api_call('/api/topics/show.json?page=0&page_size=40&node_name='+self.node)
+          
+          lines= ['%s: %s (%s)'%(t['member']['username'].encode('utf-8'),t['title'].encode('utf-8') ,t['replies'])for t in self.topics ]
+          lines.append('')
+          lines.append('$ you can type :node to your node! :tech :python :shadowsocks')
+          return lines
+
+     def get_topic(self,id):
+          self.topic=api_call('/api/topics/show.json?id=%s'%id)[0]
+          lines= ['$ '+self.topic['member']['username'].encode('utf-8'),self.topic['title'].encode('utf-8')]
+          lines.append('-'*20)
+          lines+=self.convert(self.topic['content'])
+          lines.append('-'*20)
+          self.replies=api_call('/api/replies/show.json?topic_id=%s'%id)
+          for r in self.replies:
+               lines.append('$ '+r['member']['username'].encode('utf-8'))
+               lines+=self.convert(r['content'])
+          return lines
+     def convert(self,content):
+          lines=content.encode('utf-8').split('\n')
+          r=[]
+          for line in lines:
+               i=0
+               while i<len(line):
+                    r.append(line[i:i+80])
+                    i+=80
+          return r
 
 class UI():
      def __init__(self,screen):
           self.screen =screen
+          self.v2ex=V2EX()
           content=''
-          self.filename=sys.argv[1]
-          try:
-               with open(self.filename,'r') as f: content=f.read()
-          except:pass
-          self.lines = content.split('\n')
+          self.filename=''
+          self.lines = self.v2ex.get_topics()
           self.info=''
           self.key=0
           self.show_number=True
@@ -29,7 +73,7 @@ class UI():
           self.running=True
 
      def display_status(self,msg):
-          self.screen.addstr(self.height-1,40,msg,curses.A_REVERSE)
+          self.screen.addstr(self.height-1,10,msg,curses.A_REVERSE)
 
      def color(self,line_no,start,end='$'):
           if end!='$':text=self.lines[line_no][start:end]
@@ -73,6 +117,8 @@ class UI():
                     line=self.lines[line_no]
                     self.display_line_no(i,line_no)
                     self.screen.addstr(i, self.side_width, line)
+                    if line and line[0]=='$':
+                         self.screen.addstr(i, self.side_width, line,curses.color_pair(1))
                     self.display_filter_word(self.word,line_no)
                else:
                     self.screen.addstr(i, self.side_width, '~')
@@ -164,9 +210,25 @@ class UI():
                elif re.match('\d+$',input):self.line_no=int(input)
                elif re.match('set\s+number',input):self.show_number=True
                elif re.match('/\w+',input):self.word=input[1:]
-          func=plugins.get(chr(ch))
-          if func:
-               func(self)
+               else :
+                    self.v2ex.node=input
+                    self.info=self.v2ex.node
+                    self.lines=self.v2ex.get_topics()
+                    self.reset()
+          self.v2ex_command(ch)
+     def reset(self):
+               self.line_no=0
+               self.col=0
+               self.offset=0
+     def v2ex_command(self,ch):
+          if ch==10:#enter
+               id=self.v2ex.topics[self.line_no]['id']
+               self.lines=self.v2ex.get_topic(id)
+               self.reset()
+          if ch==ord('q'):
+               self.lines=self.v2ex.get_topics()
+               self.reset()
+
      def save(self):
           with open(self.filename,'w') as f:
                f.write('\n'.join(self.lines))

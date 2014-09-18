@@ -24,6 +24,7 @@ var command_line='';
 document.addEventListener("keydown",onkeydown);
 
 function onkeydown(e){
+	console.log(e.which);
 	if(mode=='Insert'){
 		on_insert(e);
 	}else if(mode=='Command'){
