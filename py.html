@@ -1,0 +1,76 @@
+<meta charset='utf-8' />
+<style>
+.main{text-align: center;}
+p{line-height: 30px;height:30px;}
+</style>
+<div class='main'>
+<p id='result'></p>
+<p id='choice'></p>
+<p id='input'></p>
+</div>
+<script src='py.js'></script>
+<script>
+var result=document.getElementById('result');
+var inputView=document.getElementById('input');
+var choice=document.getElementById('choice');
+var page=0;
+function to(i){
+	word=input.innerHTML.trim();
+	re=cidian[word];
+	if(re){
+		re=re.slice(page*10,page*10+10);
+		result.innerHTML+=re[i];
+	}
+	input.innerHTML='';
+	choice.innerHTML='';
+	page=0;
+}
+function show_choice(){
+	word=input.innerHTML.trim();
+	console.log(word);
+	console.log(page);
+	re=cidian[word];
+    if(re!=null){
+    	re=re.slice(page*10,page*10+10);
+    	var s='';
+    	for( var i=0;i<10;i++){
+    		s+=i+' ';
+    		s+=re[i];
+    	}
+    	choice.innerHTML=s;
+		}
+}
+document.addEventListener('keydown',function(e){
+		console.log(e.keyCode);
+		var key=e.keyCode;
+		if(key>=48&&key<=57){
+			to(key-48);
+		}
+	    if(key==32){
+	    	to(0);
+	    }
+	   	if(key==187){
+	    	page+=1;
+	    	show_choice();
+	    }
+	    if(key==189){
+	    	page-=1;
+	    	show_choice();
+	    }
+	    if(key==8){
+	    	if(input.innerHTML.trim()==''){
+	    		result.innerHTML=result.innerHTML.slice(0,-1);
+	    	}else{
+	    		input.innerHTML=input.innerHTML.slice(0,-1);
+	    		page=0;
+	    	}
+	    	show_choice();
+	    }
+		if(key>=65&&key<=90){
+			input.innerHTML+=String.fromCharCode(key).toLowerCase();
+			page=0;
+			show_choice();
+		}
+	});
+
+</script>

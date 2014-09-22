@@ -63,6 +63,7 @@ class V2EX(object):
 import threading
 def event(ui,process,args):
      threading.Thread(target = ui.call,args=[ui,process,args]).start()
+
 class V2EXUI(UI):
      def __init__(self,screen):
           UI.__init__(self,screen)
@@ -89,8 +90,6 @@ class V2EXUI(UI):
                     self.info=''
                else:
                     event(self,self.v2ex.get_topics,[])
-
-
      def complex_command(self,word):
           self.v2ex.node=input
           self.info=self.v2ex.node

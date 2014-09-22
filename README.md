@@ -19,6 +19,8 @@ nodejs with curses also can surpport terminal,run as a  base version .
 
 ##v2ex.py a terminal version of v2ex.com based on the fbtext ui
 
+    python v2ex.py
+
 press [enter] for go forward,press [q] for go back.
 
 Now it's simple and runnable,but with bugs. 

@@ -21,6 +21,7 @@ class UI():
           self.col=0
           self.offset=0
           self.height=curses.tigetnum('lines')
+          self.width = curses.tigetnum('cols')
           self.word=None
           self.mode='Command'
           self.mark=None
@@ -80,22 +81,25 @@ class UI():
                self.color_selection(self.mark[0],self.mark[1],self.line_no,self.col)
 
      def display(self):
-          self.screen.clear()
-          #screen.border(0)
-          self.height=curses.tigetnum('lines')
-          self.line_no_width=len(str(len(self.lines))) #compute line no width
-          self.side_width=self.line_no_width+1
-          self.body_height=self.height-1
-          self.compute_view_lines()
-          self.display_body()
-          line=self.lines[self.line_no]
-          if self.col<len(line):char=ord(line[self.col])
-          else:char=' '
-          msg='(Mode %s)(Line %s,Column %s,offset %s,Char %s)(key %s) (%s) %s '%(self.mode,self.line_no,
-               self.col,self.offset,char,self.key,self.info,self.height)
-          self.display_status(msg)
-          self.screen.move(self.offset,self.col+self.side_width)
-          self.screen.refresh()
+          try:
+               self.screen.clear()
+               #screen.border(0)
+               self.height=curses.tigetnum('lines')
+               self.line_no_width=len(str(len(self.lines))) #compute line no width
+               self.side_width=self.line_no_width+1
+               self.body_height=self.height-1
+               self.compute_view_lines()
+               self.display_body()
+               line=self.lines[self.line_no]
+               if self.col<len(line):char=ord(line[self.col])
+               else:char=' '
+               msg='(Mode %s)(Line %s,Column %s,offset %s,Char %s)(key %s) (%s) %s '%(self.mode,self.line_no,
+                    self.col,self.offset,char,self.key,self.info,self.height)
+               self.display_status(msg)
+               self.screen.move(self.offset,self.col+self.side_width)
+               self.screen.refresh()
+          except Exception as e:
+               logging.error(str(e))
 
      def do_insert(self,ch):
           y=self.line_no
