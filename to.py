@@ -34,6 +34,7 @@ def zidian():
 	index={}
 	full_index={}
 	words=[]
+	weights=[]
 	pinyins=[]
 	with open('py2.js','w') as f:
 		i=0
@@ -49,8 +50,11 @@ def zidian():
 			add_index(full_index,all_sheng,i)
 			#print hanzi,pinyin
 			words.append(hanzi)
+			weights.append(cols[1])
 			pinyins.append(first)
 			i+=1
+		for i in index:
+			index[i]=sorted(index[i],key=lambda x:weights[x])
 
 		pinyins=list(set(pinyins))
 		save(f,'pinyins',pinyins)

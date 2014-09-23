@@ -57,20 +57,21 @@ function to(i){
 	input.innerHTML='';
 	choice.innerHTML='';
 	page=0;
+	re=[];
 }
 function query_choice(){
 	word=input.innerHTML.trim();
 	indexs1=first_index[word];
 	indexs2=full_index[word];
 	re=[];
-	if(indexs1!=null){
-		re=re.concat(indexs1);
-	}
 	if(indexs2!=null){
 		re=re.concat(indexs2);
 	}
-	//console.log(re);
+	if(indexs1!=null){
+		re=re.concat(indexs1);
+	}
 
+	//console.log(re);\
 }
 function show_choice(){
     if(re!=null){
