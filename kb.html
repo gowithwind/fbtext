@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Keyboard</title>
+    <style type="text/css">
+#keyboard {
+  //background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #9199A4), color-stop(50%, #7D8591), color-stop(100%, #535C69));
+  //border-radius: 10px;
+  background-color: #D4D8DB;
+  padding: 5px 2px;
+}
+ 
+.row {
+  margin: 15px 2px;
+  text-align: center;
+}
+ 
+.key {
+  //background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #F9F9FA), color-stop(50%, #ECEDEE), color-stop(100%, #DDDFE1));
+  background-color: #FFFFFF;
+  -webkit-box-shadow: #333 1px 1px 2px 0px;
+  height: 2em;
+  line-height: 2em;
+  font-size: 2em;
+  border-radius: 5px;
+  width: 1.4em;
+  text-align: center;
+  display: inline-block;
+  margin: 0 2px;
+  font-family: Helvetica;
+  font-weight: 800;  
+}
+ 
+.system_key {
+  //background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%, #808893), color-stop(50%, #68717D), color-stop(100%, #515A67));
+  background-color: #A8B0BD;
+  color: #FFF;
+  border: 1px solid #515A67;
+  font-weight: 600;
+}
+    </style>
+  </head>
+  <body>
+    <div id="keyboard">
+      <div class="row">
+        <div class="key">Q</div>
+        <div class="key">W</div>
+        <div class="key">E</div>
+        <div class="key">R</div>
+        <div class="key">T</div>
+        <div class="key">Y</div>
+        <div class="key">U</div>
+        <div class="key">I</div>
+        <div class="key">O</div>
+        <div class="key">P</div>
+      </div>
+      <div class="row">
+        <div class="key">A</div>
+        <div class="key">S</div>
+        <div class="key">D</div>
+        <div class="key">F</div>
+        <div class="key">G</div>
+        <div class="key">H</div>
+        <div class="key">J</div>
+        <div class="key">K</div>
+        <div class="key">L</div>
+      </div>
+      <div class="row">
+        <div class="key system_key" style="width: 2em">⌂</div>
+        <div class="key">Z</div>
+        <div class="key">X</div>
+        <div class="key">C</div>
+        <div class="key">V</div>
+        <div class="key">B</div>
+        <div class="key">N</div>
+        <div class="key">M</div>
+        <div class="key system_key" style="width: 2em">⌫</div>
+      </div>
+      <div class="row">
+        <div class="key system_key" style="width: 2.25em">123</div>
+        <div class="key system_key" style="width: 2.25em">☺</div>
+        <div class="key" style="width: 6.5em; color: #71717D; font-weight: 600;">space</div>
+        <div class="key system_key" style="width: 4em">return</div>
+      </div>
+    </div>
+  </body>
+</html>
