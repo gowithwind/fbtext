@@ -2,11 +2,74 @@
 <style>
 .main{text-align: center;}
 p{line-height: 30px;height:30px;}
+.word{border: 1px solid;padding: 2px 3px;float:left;margin:3px 3px;}
 </style>
 <div class='main'>
 <p id='result'></p>
 <p id='choice'></p>
 <p id='input'></p>
+</div>
+<div>
+<div style="width:400px;height:60px;overflow-y:hidden;">
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+	<div class="word">xxx</div>
+
+</div>
+<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
 </div>
 <script src='py2.js'></script>
 <script>
@@ -30,6 +93,38 @@ function feng(test){
 	console.log(result);
 	return result;
 }
+function pinyin_full(test){
+	var shengmu='bpmfdtlkjqxrzcsyw'; //not include g n h
+	var pre=0;
+	var result='';
+	for(var i=1;i<test.length;i++){
+		if(test[i]=="'"){
+			var token=test.slice(pre,i);
+			//result.push(token);
+			result+=token[0];
+			pre=i+1;
+		}
+		if(test[i]=='h'&&i>0&&'zcs'.indexOf(test[i-1])<0){
+			var token=test.slice(pre,i);
+			//result.push(token);
+			result+=token[0];
+			pre=i;
+		}
+		if(shengmu.indexOf(test[i])>=0){
+			//console.log(test.slice(pre,i));
+			var token=test.slice(pre,i);
+			//result.push(token);
+			result+=token[0];
+			pre=i;
+		}
+	}
+	if(pre<test.length){
+		var token=test.slice(pre,i);
+		result+=token[0];
+		//result.push(token);
+	}
+	return result;
+}
 v1='我爱北京天安门' 
 v2='wo ai bei jing tian an meng'
 
@@ -47,9 +142,10 @@ var result=document.getElementById('result');
 var inputView=document.getElementById('input');
 var choice=document.getElementById('choice');
 var page=0;
+var full='';
 var re=[];
 function to(i){
-	if(re!=null){
+	if(re!=null&&re.length>0){
 		re=re.slice(page*10,page*10+10);
 		if(i==0)i=10;
 		result.innerHTML+=words[re[(i-1)%10]];
@@ -59,18 +155,24 @@ function to(i){
 	page=0;
 	re=[];
 }
+function sort_by(a,b){
+	return weights[b]-weights[a];
+}
 function query_choice(){
 	word=input.innerHTML.trim();
+	var indexs1,indexs2;
 	indexs1=first_index[word];
-	indexs2=full_index[word];
+	full=pinyin_full(word);
+	if(full.length>1)
+		indexs2=full_index[full];
 	re=[];
-	if(indexs2!=null){
-		re=re.concat(indexs2);
-	}
 	if(indexs1!=null){
 		re=re.concat(indexs1);
 	}
-
+	if(indexs2!=null){
+		re=re.concat(indexs2);
+	}
+	re=re.sort(sort_by);
 	//console.log(re);\
 }
 function show_choice(){
@@ -78,9 +180,9 @@ function show_choice(){
     	choices=re.slice(page*10,page*10+10);
     	var s='';
     	for( var i=0;i<choices.length;i++){
-    		s+=(i+1)%10+' '+words[choices[i]];
+    		s+=(i+1)%10+' '+words[choices[i]] ;//+' '+weights[choices[i]];
     	}
-    	choice.innerHTML=s;
+    	choice.innerHTML=s+' $'+re.length +' full '+full;
 	}
 }
 document.addEventListener('keydown',function(e){
@@ -113,6 +215,12 @@ document.addEventListener('keydown',function(e){
 	    }
 		if(key>=65&&key<=90){
 			input.innerHTML+=String.fromCharCode(key).toLowerCase();
+			query_choice();
+			page=0;
+			show_choice();
+		}
+		if(key==222){
+			input.innerHTML+="'";
 			query_choice();
 			page=0;
 			show_choice();

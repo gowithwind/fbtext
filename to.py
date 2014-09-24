@@ -43,24 +43,34 @@ def zidian():
 			hanzi=cols[0]
 			pinyin=cols[3:]
 			first=pinyin[0]
+
+			length=len(pinyin)
+			#for single hanzi
+			if length==1:
+				all=''
+				for char in first:
+					all+=char
+					add_index(index,all,i)
+			#for ciyu
 			all_sheng=''
 			for p in pinyin:
 				all_sheng+=p[0]
-			add_index(index,first,i)
-			add_index(full_index,all_sheng,i)
+				add_index(full_index,all_sheng,i)
 			#print hanzi,pinyin
 			words.append(hanzi)
-			weights.append(cols[1])
+			weights.append(float(cols[1]))
 			pinyins.append(first)
 			i+=1
-		for i in index:
-			index[i]=sorted(index[i],key=lambda x:weights[x])
 
+		for i in index:
+			list_i=index[i]
+			index[i]=sorted(list_i,key=lambda x:weights[x],reverse=True)
+			#if i=='e':print index[i]
 		pinyins=list(set(pinyins))
 		save(f,'pinyins',pinyins)
 		save(f,'words',words)
+		save(f,'weights',weights)
 		save(f,'first_index',index)
 		save(f,'full_index',full_index)
-
 
 zidian()
